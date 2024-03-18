@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import SearchBar from './Searchbar/Searchbar';
 import ImageGallery from './ImageGallery/ImageGallery';
 import Button from './Button/Button';
@@ -6,102 +6,78 @@ import Loader from './Loader/Loader';
 import { getAPI } from 'pixabay-api';
 import styles from './App.module.css';
 
-class App extends Component {
-  state = {
-    images: [],
-    currentPage: 1,
-    searchQuery: '',
-    isLoading: false,
-    isError: false,
-    isEnd: false,
-  };
+const App = () => {
+  const [images, setImages] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [isEnd, setIsEnd] = useState(false);
 
-  async componentDidUpdate(_prevProps, prevState) {
-    const { searchQuery, currentPage } = this.state;
+  useEffect(() => {
+    const fetchImages = async () => {
+      if (!searchQuery) return;
 
-    if (
-      prevState.searchQuery !== searchQuery ||
-      prevState.currentPage !== currentPage
-    ) {
-      await this.fetchImages();
-    }
-  }
+      setIsLoading(true);
+      setIsError(false);
 
-  fetchImages = async () => {
-    this.setState({ isLoading: true, isError: false });
+      try {
+        const response = await getAPI(searchQuery, currentPage);
+        const { totalHits, hits } = response;
 
-    const { searchQuery, currentPage } = this.state;
-
-    try {
-      const response = await getAPI(searchQuery, currentPage);
-      console.log(response);
-      const { totalHits, hits } = response;
-
-      this.setState(prevState => ({
-        images: currentPage === 1 ? hits : [...prevState.images, ...hits],
-        isLoading: false,
-        isEnd: prevState.images.length + hits.length >= totalHits,
-      }));
-
-      if (hits.length === 0) {
-        alert('No images found. Try a different search.');
-        return;
+        setImages(prev => (currentPage === 1 ? hits : [...prev, ...hits]));
+        setIsLoading(false);
+        setIsEnd(images.length + hits.length >= totalHits);
+      } catch (error) {
+        setIsLoading(false);
+        setIsError(true);
+        alert(`An error occurred while fetching data: ${error}`);
       }
-    } catch (error) {
-      this.setState({ isLoading: false, isError: true });
-      alert(`An error occurred while fetching data: ${error}`);
-    }
-  };
+    };
 
-  handleSearchSubmit = query => {
+    fetchImages();
+  }, [searchQuery, currentPage]);
+
+  const handleSearchSubmit = query => {
     const normalizedQuery = query.trim().toLowerCase();
-    const normalizedCurrentQuery = this.state.searchQuery.toLowerCase();
 
     if (normalizedQuery === '') {
       alert(`Empty string is not a valid search query. Please type again.`);
       return;
     }
 
-    if (normalizedQuery === normalizedCurrentQuery) {
+    if (normalizedQuery === searchQuery) {
       alert(
         `Search query is the same as the previous one. Please provide a new search query.`
       );
       return;
     }
 
-    // Only update the state and fetch images if the new query is different
-    if (normalizedQuery !== normalizedCurrentQuery) {
-      this.setState({
-        searchQuery: normalizedQuery,
-        currentPage: 1,
-        images: [],
-        isEnd: false,
-      });
-    }
+    setSearchQuery(normalizedQuery);
+    setCurrentPage(1);
+    setImages([]);
+    setIsEnd(false);
   };
 
-  handleLoadMore = () => {
-    if (!this.state.isEnd) {
-      this.setState(prevState => ({ currentPage: prevState.currentPage + 1 }));
+  const handleLoadMore = () => {
+    if (!isEnd) {
+      setCurrentPage(prev => prev + 1);
     } else {
       alert("You've reached the end of the search results.");
     }
   };
 
-  render() {
-    const { images, isLoading, isError, isEnd } = this.state;
-    return (
-      <div className={styles.App}>
-        <SearchBar onSubmit={this.handleSearchSubmit} />
-        <ImageGallery images={images} />
-        {isLoading && <Loader />}
-        {!isLoading && !isError && images.length > 0 && !isEnd && (
-          <Button onClick={this.handleLoadMore} />
-        )}
-        {isError && <p>Something went wrong. Please try again later.</p>}
-      </div>
-    );
-  }
-}
+  return (
+    <div className={styles.App}>
+      <SearchBar onSubmit={handleSearchSubmit} />
+      <ImageGallery images={images} />
+      {isLoading && <Loader />}
+      {!isLoading && !isError && images.length > 0 && !isEnd && (
+        <Button onClick={handleLoadMore} />
+      )}
+      {isError && <p>Something went wrong. Please try again later.</p>}
+    </div>
+  );
+};
 
 export default App;
