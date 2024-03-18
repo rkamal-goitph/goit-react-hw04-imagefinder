@@ -1,0 +1,30 @@
+/* ImageGalleryItem.module.css */
+.galleryItem {
+  border-radius: 10px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  width: 20%;
+  height: 24vh;
+}
+
+.galleryItem img {
+  display: block;
+  width: auto;
+  height: auto;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+  border: 3px solid #f0f8ff;
+  overflow: hidden;
+}
+
+.galleryItem:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+}
+
+.galleryItem:hover img {
+  transform: scale(1.05);
+  border-color: #ff85a2;
+}
