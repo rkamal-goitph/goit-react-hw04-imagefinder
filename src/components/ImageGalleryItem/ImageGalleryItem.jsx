@@ -1,23 +1,17 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import Modal from '../Modal/Modal';
 import styles from './ImageGalleryItem.module.css';
+import { useToggle } from 'hooks/useToggle';
 
 const ImageGalleryItem = ({ image }) => {
-  const [showModal, setShowModal] = useState(false);
-
-  const toggleModal = () => {
-    setShowModal(!showModal);
-  };
-
+  const { isOpen, toggle } = useToggle();
   const { webformatURL, largeImageURL, tags } = image;
 
   return (
-    <li className={styles.galleryItem} onClick={toggleModal}>
+    <li className={styles.galleryItem} onClick={toggle}>
       <img src={webformatURL} alt={tags} />
-      {showModal && (
-        <Modal image={largeImageURL} tags={tags} onClose={toggleModal} />
-      )}
+      {isOpen && <Modal image={largeImageURL} tags={tags} onClose={toggle} />}
     </li>
   );
 };
