@@ -4,8 +4,7 @@ import Modal from '../Modal/Modal';
 import styles from './ImageGalleryItem.module.css';
 import { useToggle } from 'hooks/useToggle';
 
-const ImageGalleryItem = () => {
-  const { image } = props;
+const ImageGalleryItem = ({ image }) => {
   const { isOpen, toggle } = useToggle();
   const { webformatURL, largeImageURL, tags } = image;
 

@@ -2,9 +2,7 @@ import React, { useEffect, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
 import styles from './Modal.module.css';
 
-const Modal = () => {
-  const { image, tags, onClose } = props;
-
+const Modal = ({ image, tags, onClose }) => {
   const onCloseRef = useRef(onClose);
 
   // Update the ref to the latest onClose function on every render
