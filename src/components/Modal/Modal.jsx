@@ -1,20 +1,27 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
 import styles from './Modal.module.css';
 
 const Modal = ({ image, tags, onClose }) => {
+  const onCloseRef = useRef(onClose);
+
+  // Update the ref to the latest onClose function on every render
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
+
+  const handleKeyDown = useCallback(e => {
+    if (e.code === 'Escape') {
+      onCloseRef.current();
+    }
+  }, []);
+
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
-
-  const handleKeyDown = e => {
-    if (e.code === 'Escape') {
-      onClose();
-    }
-  };
+  }, [handleKeyDown]);
 
   return (
     <div className={styles.overlay}>
