@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import ImageGalleryItem from '../ImageGalleryItem/ImageGalleryItem';
 import styles from './ImageGallery.module.css';
 
-const ImageGallery = ({ images }) => {
+const ImageGallery = props => {
+  const { images } = props;
   return (
     <ul className={`${styles.gallery} js-gallery`}>
       {images.map(image => (
