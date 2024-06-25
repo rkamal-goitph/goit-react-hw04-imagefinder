@@ -5,6 +5,7 @@ import Button from './Button/Button';
 import Loader from './Loader/Loader';
 import { getAPI } from 'pixabay-api';
 import styles from './App.module.css';
+import toast, { Toaster } from 'react-hot-toast';
 
 const App = () => {
   const [images, setImages] = useState([]);
@@ -25,13 +26,27 @@ const App = () => {
         const response = await getAPI(searchQuery, currentPage);
         const { totalHits, hits } = response;
 
+        // Check if the API returns no images for the search query
+        if (hits.length === 0) {
+          toast.error(
+            'Sorry, there are no images matching your search query. Please try again.'
+          );
+          setIsLoading(false);
+          return;
+        }
+
+        // Display a success message when the first page is loaded
+        if (currentPage === 1) {
+          toast.success(`Hooray! We found ${totalHits} images!`);
+        }
+
         setImages(prev => (currentPage === 1 ? hits : [...prev, ...hits]));
-        setIsLoading(false);
-        setIsEnd(images.length + hits.length >= totalHits);
+        setIsEnd(currentPage * 12 >= totalHits);
       } catch (error) {
-        setIsLoading(false);
         setIsError(true);
-        alert(`An error occurred while fetching data: ${error}`);
+        toast.error('Oops, something went wrong! Reload this page!');
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -63,7 +78,14 @@ const App = () => {
     if (!isEnd) {
       setCurrentPage(prev => prev + 1);
     } else {
-      alert("You've reached the end of the search results.");
+      toast("We're sorry, but you've reached the end of search results.", {
+        icon: '👏',
+        style: {
+          borderRadius: '10px',
+          background: '#333',
+          color: '#fff',
+        },
+      });
     }
   };
 
@@ -76,6 +98,7 @@ const App = () => {
         <Button onClick={handleLoadMore} />
       )}
       {isError && <p>Something went wrong. Please try again later.</p>}
+      <Toaster position="top-right" reverseOrder={false} />
     </div>
   );
 };
