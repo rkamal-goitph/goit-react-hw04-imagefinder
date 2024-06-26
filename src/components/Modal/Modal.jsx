@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import styles from './Modal.module.css';
 
 const Modal = ({ image, tags, onClose }) => {
+  // Assign a reference to the onClose prop to stabilize its value
   const onCloseRef = useRef(onClose);
 
   // Update the ref to the latest onClose function on every render
@@ -10,19 +11,21 @@ const Modal = ({ image, tags, onClose }) => {
     onCloseRef.current = onClose;
   }, [onClose]);
 
-  const handleKeyDown = useCallback(e => {
-    if (e.code === 'Escape') {
-      onCloseRef.current();
-    }
-  }, []);
-
   useEffect(() => {
+    // Define handleKeyDown without having to add it in the dependency array
+    const handleKeyDown = e => {
+      if (e.code === 'Escape') {
+        onCloseRef.current();
+      }
+    };
+
     window.addEventListener('keydown', handleKeyDown);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [handleKeyDown]);
+  }, []); // Empty dependency array
 
+  // Render the modal content
   return (
     <div className={styles.overlay}>
       <div className={styles.modal}>
