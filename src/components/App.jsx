@@ -6,16 +6,13 @@ import Loader from './Loader/Loader';
 import styles from './App.module.css';
 import { Toaster } from 'react-hot-toast';
 import { useImages } from 'context/ImagesContext';
+import { useSearchQuery } from 'context/SearchQueryContext';
+import { usePagination } from 'context/PaginationContext';
 
 const App = () => {
-  const {
-    images,
-    isLoading,
-    isError,
-    isEnd,
-    handleSearchSubmit,
-    handleLoadMore,
-  } = useImages();
+  const { images, isLoading, isError } = useImages();
+  const { handleSearchSubmit } = useSearchQuery();
+  const { handleLoadMore, isEnd } = usePagination();
 
   return (
     <div className={styles.App}>

@@ -1,6 +1,8 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { getAPI } from 'pixabay-api';
 import toast from 'react-hot-toast';
+import { useSearchQuery } from './SearchQueryContext';
+import { usePagination } from './PaginationContext';
 
 const ImagesContext = createContext();
 
@@ -8,11 +10,11 @@ export const useImages = () => useContext(ImagesContext);
 
 export const ImagesProvider = ({ children }) => {
   const [images, setImages] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
-  const [isEnd, setIsEnd] = useState(false);
+
+  const { searchQuery } = useSearchQuery();
+  const { currentPage, setIsEnd } = usePagination();
 
   useEffect(() => {
     const fetchImages = async () => {
@@ -48,55 +50,10 @@ export const ImagesProvider = ({ children }) => {
     };
 
     fetchImages();
-  }, [searchQuery, currentPage]);
-
-  const handleSearchSubmit = query => {
-    const normalizedQuery = query.trim().toLowerCase();
-
-    if (normalizedQuery === '') {
-      alert(`Empty string is not a valid search query. Please type again.`);
-      return;
-    }
-
-    if (normalizedQuery === searchQuery) {
-      alert(
-        `Search query is the same as the previous one. Please provide a new search query.`
-      );
-      return;
-    }
-
-    setSearchQuery(normalizedQuery);
-    setCurrentPage(1);
-    setImages([]);
-    setIsEnd(false);
-  };
-
-  const handleLoadMore = () => {
-    if (!isEnd) {
-      setCurrentPage(prev => prev + 1);
-    } else {
-      toast("We're sorry, but you've reached the end of search results.", {
-        icon: '👏',
-        style: {
-          borderRadius: '10px',
-          background: '#333',
-          color: '#fff',
-        },
-      });
-    }
-  };
+  }, [searchQuery, currentPage, setIsEnd]);
 
   return (
-    <ImagesContext.Provider
-      value={{
-        images,
-        isLoading,
-        isError,
-        isEnd,
-        handleSearchSubmit,
-        handleLoadMore,
-      }}
-    >
+    <ImagesContext.Provider value={{ images, isLoading, isError }}>
       {children}
     </ImagesContext.Provider>
   );
