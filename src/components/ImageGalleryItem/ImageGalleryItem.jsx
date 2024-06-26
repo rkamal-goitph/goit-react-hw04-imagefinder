@@ -5,26 +5,28 @@ import styles from './ImageGalleryItem.module.css';
 import { useToggle } from 'hooks/useToggle';
 
 const ImageGalleryItem = ({ image }) => {
-  const { isOpen, toggle } = useToggle();
+  const { showModal, toggle } = useToggle();
   const { webformatURL, largeImageURL, tags } = image;
 
   useEffect(() => {
     const gallery = document.querySelector('.js-gallery');
     if (!gallery) return;
 
-    if (isOpen) {
+    if (showModal) {
       console.log('Modal is now shown');
       gallery.style.pointerEvents = 'none';
     } else {
       console.log('Modal is now hidden');
       gallery.style.pointerEvents = 'auto';
     }
-  }, [isOpen]);
+  }, [showModal]);
 
   return (
     <li className={styles.galleryItem} onClick={toggle}>
       <img src={webformatURL} alt={tags} />
-      {isOpen && <Modal image={largeImageURL} tags={tags} onClose={toggle} />}
+      {showModal && (
+        <Modal image={largeImageURL} tags={tags} onClose={toggle} />
+      )}
     </li>
   );
 };
