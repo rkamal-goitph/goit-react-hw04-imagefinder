@@ -1,4 +1,10 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useContext,
+  useMemo,
+} from 'react';
 import { getAPI } from 'pixabay-api';
 import toast from 'react-hot-toast';
 
@@ -86,7 +92,7 @@ export const ImagesProvider = ({ children }) => {
     }
   };
 
-  const uniqueTags = () => {
+  const uniqueTags = useMemo(() => {
     console.log('Calculating unique tags...');
     const tagSet = new Set();
     images.forEach(image => {
@@ -94,7 +100,7 @@ export const ImagesProvider = ({ children }) => {
     });
     console.log('Unique tags calculated:', Array.from(tagSet));
     return Array.from(tagSet);
-  };
+  }, [images]);
 
   return (
     <ImagesContext.Provider
@@ -105,7 +111,7 @@ export const ImagesProvider = ({ children }) => {
         isEnd,
         handleSearchSubmit,
         handleLoadMore,
-        uniqueTags: uniqueTags(), // calculate unique tags directly
+        uniqueTags, // provide the unique tags in the context
       }}
     >
       {children}
