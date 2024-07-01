@@ -86,6 +86,16 @@ export const ImagesProvider = ({ children }) => {
     }
   };
 
+  const uniqueTags = () => {
+    console.log('Calculating unique tags...');
+    const tagSet = new Set();
+    images.forEach(image => {
+      image.tags.split(', ').forEach(tag => tagSet.add(tag));
+    });
+    console.log('Unique tags calculated:', Array.from(tagSet));
+    return Array.from(tagSet);
+  };
+
   return (
     <ImagesContext.Provider
       value={{
@@ -95,6 +105,7 @@ export const ImagesProvider = ({ children }) => {
         isEnd,
         handleSearchSubmit,
         handleLoadMore,
+        uniqueTags: uniqueTags(), // calculate unique tags directly
       }}
     >
       {children}

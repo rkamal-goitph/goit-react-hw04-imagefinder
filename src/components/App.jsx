@@ -15,6 +15,7 @@ const App = () => {
     isEnd,
     handleSearchSubmit,
     handleLoadMore,
+    uniqueTags, // access unique tags
   } = useImages();
 
   return (
@@ -26,6 +27,14 @@ const App = () => {
         <Button onClick={handleLoadMore} />
       )}
       {isError && <p>Something went wrong. Please try again later.</p>}
+      <div className={styles.UniqueTags}>
+        <h2>Unique Tags</h2>
+        <ul>
+          {uniqueTags.map(tag => (
+            <li key={tag}>{tag}</li>
+          ))}
+        </ul>
+      </div>
       <Toaster position="top-right" reverseOrder={false} />
     </div>
   );
